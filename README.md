@@ -47,5 +47,12 @@ Nunca coloque credenciais administrativas ou chaves privadas no frontend. As var
 - Filtros por grupo muscular
 - Tela de detalhes com equipamento, nível, descrição, execução e dicas
 
+## V5 - montador de treino personalizado
+- Criar treinos próprios
+- Adicionar e remover exercícios da biblioteca
+- Definir séries, repetições e descanso por exercício
+- Salvar treinos personalizados localmente e, com Firebase configurado, na nuvem
+- Abrir o treino salvo e iniciar o mesmo fluxo de registro de séries da V2
+
 ## Próximas versões
 Autenticação por e-mail/Google, biblioteca de exercícios com vídeos, planos por objetivo, gráficos de carga e publicação mobile.
