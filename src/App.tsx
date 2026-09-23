@@ -1,4 +1,5 @@
 import {useEffect,useMemo,useState} from 'react';
+import type {FormEvent} from 'react';
 import {Dumbbell,Home,CalendarDays,BarChart3,User,Play,Clock3,ChevronRight,Flame,Pause,RotateCcw,Volume2,Check,Plus,Minus,Calculator} from 'lucide-react';
 import {exercises,plans} from './data';
 import {firebaseConfigured} from './firebase';
@@ -20,7 +21,7 @@ export default function App(){
  const plan=useMemo(()=>plans[0],[]);
  useEffect(()=>watchAuth(setAuthUser),[]);
  useEffect(()=>{if(!authUser)return; return watchHistory(authUser.uid,(items)=>{setHistory(items);localStorage.setItem(HISTORY_KEY,JSON.stringify(items));});},[authUser]);
- const submitAuth=async(e:React.FormEvent)=>{e.preventDefault();setAuthError('');setAuthBusy(true);try{if(authMode==='login')await login(email,password);else await register(email,password);setPassword('');}catch(err:any){setAuthError(err?.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':err?.code==='auth/email-already-in-use'?'Este e-mail já está cadastrado.':err?.message||'Não foi possível entrar.');}finally{setAuthBusy(false)}};
+ const submitAuth=async(e:FormEvent)=>{e.preventDefault();setAuthError('');setAuthBusy(true);try{if(authMode==='login')await login(email,password);else await register(email,password);setPassword('');}catch(err:any){setAuthError(err?.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':err?.code==='auth/email-already-in-use'?'Este e-mail já está cadastrado.':err?.message||'Não foi possível entrar.');}finally{setAuthBusy(false)}};
  useEffect(()=>{if(!running||remaining<=0)return; const id=window.setInterval(()=>setRemaining(v=>Math.max(0,v-1)),1000); return()=>window.clearInterval(id)},[running,remaining]);
  useEffect(()=>{if(running&&remaining===0){setRunning(false);setFinished(true); try{navigator.vibrate?.([200,100,200]); const C=window.AudioContext||(window as any).webkitAudioContext; if(C){const c=new C();const o=c.createOscillator();const g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(.08,c.currentTime);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.35)}}catch{}}},[remaining,running]);
  useEffect(()=>{if(finished){const id=window.setTimeout(()=>setFinished(false),3500);return()=>window.clearTimeout(id)}},[finished]);
