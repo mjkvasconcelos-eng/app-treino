@@ -18,7 +18,45 @@ function Home({go,history,profile,cloud}){const last=history[0];return <><Header
 
 function Library({go}){const [query,setQuery]=useState('');const [group,setGroup]=useState('Todos');const filtered=useMemo(()=>exercises.filter(e=>(group==='Todos'||e.group===group)&&e.name.toLowerCase().includes(query.toLowerCase())),[query,group]);return <><Header title="Exercícios" onBack={()=>go('home')}/><main className="page"><div className="searchBox"><Search size={19}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar exercício por nome"/></div><div className="filterTitle"><h3>Grupo muscular</h3><Filter size={18}/></div><div className="chips">{exerciseGroups.map(g=><button key={g} className={group===g?'chip active':'chip'} onClick={()=>setGroup(g)}>{g}</button>)}</div><p className="muted">{filtered.length} exercício(s) encontrado(s)</p><div className="cards">{filtered.map(e=><button className="programCard" key={e.id} onClick={()=>go('exercise',e)}><div className="programIcon"><Dumbbell size={22}/></div><div className="cardText"><h3>{e.name}</h3><span>{e.group} • {e.level}</span><p>{e.equipment}</p></div><ChevronRight/></button>)}</div>{filtered.length===0&&<div className="empty"><Search size={34}/><b>Nenhum exercício encontrado</b><span>Tente outro nome ou grupo muscular.</span></div>}</main><BottomNav active="library" go={go}/></>}
 
-function ExerciseDetails({exercise,go}){return <><Header title="Detalhes do exercício" onBack={()=>go('library')}/><main className="page"><section className="exerciseHero"><div className="exerciseHeroIcon"><Dumbbell size={34}/></div><span>{exercise.group}</span><h2>{exercise.name}</h2><p>{exercise.description}</p><div className="exerciseMeta"><b>{exercise.level}</b><b>{exercise.equipment}</b></div></section><section className="detailSection"><h3>Como executar</h3><ol>{exercise.instructions.map((step,i)=><li key={i}>{step}</li>)}</ol></section><section className="detailSection tip"><Info size={19}/><div><b>Dica</b><p>{exercise.tips}</p></div></section><button className="primary full" onClick={()=>go('programs')}>Ver programas</button></main></>}
+function ExerciseAnimation({exercise}){
+  const [playing,setPlaying]=useState(true);
+  const movementClass=`motion-${exercise.id}`;
+  return <section className="exerciseDemo">
+    <div className="exerciseDemoHead">
+      <div><span>GUIA VISUAL</span><h3>Veja o movimento</h3></div>
+      <button className={playing?'demoToggle active':'demoToggle'} onClick={()=>setPlaying(v=>!v)}>{playing?'Pausar':'Reproduzir'} <Play size={15}/></button>
+    </div>
+    <div className={playing?`motionStage ${movementClass}`:`motionStage paused ${movementClass}`}>
+      <div className="motionGlow"/>
+      <svg viewBox="0 0 320 210" role="img" aria-label={`Animação demonstrativa de ${exercise.name}`}>
+        <defs>
+          <linearGradient id="bodyGrad" x1="0" x2="1"><stop offset="0%" stopColor="#d1d5db"/><stop offset="100%" stopColor="#ffffff"/></linearGradient>
+        </defs>
+        <g className="motionFigure">
+          <circle className="motionHead" cx="160" cy="38" r="15"/>
+          <path className="motionBody" d="M160 55 L160 112 M160 68 L116 88 M160 68 L204 88 M160 112 L132 170 M160 112 L188 170"/>
+          <circle className="motionJoint" cx="116" cy="88" r="5"/><circle className="motionJoint" cx="204" cy="88" r="5"/>
+          <circle className="motionJoint" cx="132" cy="170" r="5"/><circle className="motionJoint" cx="188" cy="170" r="5"/>
+          <path className="motionFloor" d="M70 184 H250"/>
+          <path className="motionEquipment" d="M92 87 H228 M100 80 V94 M220 80 V94"/>
+        </g>
+      </svg>
+      <div className="motionCue"><b>Movimento controlado</b><span>Evite impulso e mantenha a técnica.</span></div>
+    </div>
+    <div className="motionSteps">
+      <span><b>1</b>Posição inicial</span><span><b>2</b>Execute com controle</span><span><b>3</b>Retorne lentamente</span>
+    </div>
+  </section>
+}
+
+function ExerciseDetails({exercise,go}){return <><Header title="Detalhes do exercício" onBack={()=>go('library')}/><main className="page">
+  <section className="exerciseHero"><div className="exerciseHeroIcon"><Dumbbell size={34}/></div><span>{exercise.group}</span><h2>{exercise.name}</h2><p>{exercise.description}</p><div className="exerciseMeta"><b>{exercise.level}</b><b>{exercise.equipment}</b></div></section>
+  <ExerciseAnimation exercise={exercise}/>
+  <section className="detailSection"><h3>Como executar</h3><ol>{exercise.instructions.map((step,i)=><li key={i}>{step}</li>)}</ol></section>
+  <section className="detailSection tip"><Info size={19}/><div><b>Dica</b><p>{exercise.tips}</p></div></section>
+  <button className="primary full" onClick={()=>go('programs')}>Ver programas</button>
+  <p className="exerciseSafety">A animação é uma referência visual. Ajuste carga, amplitude e execução ao seu nível e, se tiver dor ou dúvida técnica, procure orientação de um profissional qualificado.</p>
+</main></>}
 
 function CustomWorkouts({go,customWorkouts}){return <><Header title="Meus treinos" onBack={()=>go('home')}/><main className="page"><button className="primary full createWorkoutBtn" onClick={()=>go('builder')}><Dumbbell/> Criar novo treino</button><p className="muted">Seus treinos personalizados ficam salvos no aparelho e, com Firebase configurado, também na nuvem.</p><div className="cards">{customWorkouts.length===0?<div className="empty"><Dumbbell size={34}/><b>Nenhum treino personalizado</b><span>Monte seu primeiro treino escolhendo os exercícios.</span></div>:customWorkouts.map(w=><button className="programCard" key={w.id} onClick={()=>go('customDetails',w)}><div className="programIcon"><Dumbbell size={22}/></div><div className="cardText"><h3>{w.name}</h3><span>{w.exercises.length} exercícios • {w.level||'Personalizado'}</span><p>{w.exercises.reduce((s,e)=>s+e.sets,0)} séries</p></div><ChevronRight/></button>)}</div></main><BottomNav active="custom" go={go}/></>}
 
