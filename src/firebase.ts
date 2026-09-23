@@ -3,15 +3,16 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDREdq56SV_HVhyC_t40OvazuAK2TaX1go",
+  authDomain: "app-treino-640b4.firebaseapp.com",
+  projectId: "app-treino-640b4",
+  storageBucket: "app-treino-640b4.firebasestorage.app",
+  messagingSenderId: "752078428156",
+  appId: "1:752078428156:web:298b9566b499f8d5c54479",
+  measurementId: "G-H0VN7ZGJZQ",
 };
 
-export const firebaseConfigured = Object.values(firebaseConfig).every(Boolean);
-export const app = firebaseConfigured ? (getApps()[0] ?? initializeApp(firebaseConfig)) : null;
-export const auth = app ? getAuth(app) : null;
-export const db = app ? getFirestore(app) : null;
+export const firebaseConfigured = true;
+export const app = getApps()[0] ?? initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
