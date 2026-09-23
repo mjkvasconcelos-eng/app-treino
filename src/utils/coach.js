@@ -143,7 +143,7 @@ export const preWorkoutQuestions=[
   ]}
 ];
 
-export function buildPreWorkoutAdjustment(answers={},session){
+export function buildPreWorkoutAdjustment(answers={},plannedSession){
   const sleep=Number(answers.sleep)||3;
   const energy=Number(answers.energy)||3;
   const soreness=Number(answers.soreness)||1;
@@ -155,7 +155,7 @@ export function buildPreWorkoutAdjustment(answers={},session){
   if(pain===2||score<55){status='recuperacao';loadMultiplier=.85;setsMultiplier=.75;restMultiplier=1.3;title='Sessão de recuperação';summary='Hoje o coach reduz o estímulo para controlar fadiga e preservar a qualidade do treino.'}
   else if(pain===1||score<70){status='moderado';loadMultiplier=.95;setsMultiplier=.85;restMultiplier=1.2;title='Treino com autorregulação';summary='O coach reduz levemente o estímulo e aumenta o descanso. Evite progressão de carga hoje.'}
   else if(score<82){status='controlado';loadMultiplier=.98;setsMultiplier=1;restMultiplier=1.1;title='Treino controlado';summary='A sessão segue o plano, mas com margem extra de recuperação e sem progressão agressiva.'}
-  const session=Array.isArray(session?.exercises)?{...session,exercises:session.exercises.map(e=>{const baseWeight=Number(e.weight)||0;const sets=Math.max(1,Math.round((Number(e.sets)||1)*setsMultiplier));const weight=baseWeight?roundWeight(baseWeight*loadMultiplier):0;const rest=Math.round((Number(e.rest)||60)*restMultiplier);return {...e,sets,weight,rest,action:status==='normal'?e.action:'reduzir'}})}:null;
+  const session=Array.isArray(plannedSession?.exercises)?{...plannedSession,exercises:plannedSession.exercises.map(e=>{const baseWeight=Number(e.weight)||0;const sets=Math.max(1,Math.round((Number(e.sets)||1)*setsMultiplier));const weight=baseWeight?roundWeight(baseWeight*loadMultiplier):0;const rest=Math.round((Number(e.rest)||60)*restMultiplier);return {...e,sets,weight,rest,action:status==='normal'?e.action:'reduzir'}})}:null;
   return {status,score,loadMultiplier,setsMultiplier,restMultiplier,title,summary,session,details:{
     sleep:preWorkoutQuestions[0].options.find(x=>x.value===sleep)?.effect,
     energy:preWorkoutQuestions[1].options.find(x=>x.value===energy)?.effect,
