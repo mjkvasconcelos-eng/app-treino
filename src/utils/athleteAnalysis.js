@@ -51,7 +51,9 @@ export function buildAthleteAnalysis(history,profile){
 
   const totalSets=week.reduce((sum,w)=>sum+(w.exercises||[]).reduce((s,e)=>s+(e.sets||0),0),0);
   const avgRpe=avg(week.flatMap(w=>(w.exercises||[]).flatMap(e=>(e.details||[]).map(x=>Number(x.rpe)||0))));
-  const currentSets=week.reduce((s,w)=>s+(w.exercises||[]).reduce((x,e)=>x+(e.sets||0),0),0);\n  const previousSets=previousWeek.reduce((s,w)=>s+(w.exercises||[]).reduce((x,e)=>x+(e.sets||0),0),0);\n  const volumeTrend=previousWeek.length?Math.round(((currentSets-previousSets)/Math.max(1,previousSets))*100):0;
+  const currentSets=week.reduce((s,w)=>s+(w.exercises||[]).reduce((x,e)=>x+(e.sets||0),0),0);
+  const previousSets=previousWeek.reduce((s,w)=>s+(w.exercises||[]).reduce((x,e)=>x+(e.sets||0),0),0);
+  const volumeTrend=previousWeek.length?Math.round(((currentSets-previousSets)/Math.max(1,previousSets))*100):0;
 
   const recommendations=[];
   if(week.length<targetDays) recommendations.push({title:'Aumente a consistência',text:`Você registrou ${week.length} de ${targetDays} sessões. Planeje os dias da próxima semana antes de aumentar volume.`});
