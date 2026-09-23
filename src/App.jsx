@@ -31,7 +31,7 @@ function ExerciseAnimation({exercise}){
     <div className="exerciseVisualStage">
       {gif
         ? <img className="exerciseGif" src={gif} alt={'Demonstração de '+exercise.name}/>
-        : <div className={playing?'exercise3DFallback':'exercise3DFallback paused'}><Exercise3DDemo exercise={exercise}/></div>}
+        : <div className={playing?'exercise3DFallback':'exercise3DFallback paused'}><Exercise3DDemo exercise={exercise} playing={playing}/></div>}
     </div>
     <div className="exerciseVisualControls">
       <button className={showSteps?'visualTab active':'visualTab'} onClick={()=>setShowSteps(v=>!v)}>{showSteps?'Ocultar execução':'Ver execução'}</button>
