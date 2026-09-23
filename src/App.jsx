@@ -15,8 +15,67 @@ import Exercise3DDemo from './components/Exercise3DDemo';
 
 function Header({title,onBack}){return <header className="header">{onBack?<button className="iconBtn" onClick={onBack}><ArrowLeft size={22}/></button>:<div className="logoMark">AT</div>}<h1>{title}</h1><div style={{width:40}}/></header>}
 
-function Home({go,history,profile,cloud}){const last=history[0];return <><Header title="App Treino"/><main className="page"><CloudStatus cloud={cloud}/><section className="hero"><span>SEU TREINO DE HOJE</span><h2>Olá, {profile.name}!</h2><p>Pronto para evoluir? Escolha um programa e registre seu progresso.</p><button className="primary" onClick={()=>go('programs')}>Ver programas <ChevronRight size={20}/></button><button className="secondary heroSecondary" onClick={()=>go('globalPrograms')}><TrendingUp size={18}/> Explorar treinos globais</button><button className="secondary heroSecondary" onClick={()=>go('personalPlan')}><Dumbbell size={18}/> Criar meu plano automático</button><button className="secondary heroSecondary" onClick={()=>go('coach')}><TrendingUp size={18}/> Abrir Personal Trainer</button></section><section><div className="sectionTitle"><h3>Acesso rápido</h3></div><div className="quickGrid"><button onClick={()=>go('programs')}><Dumbbell/><b>Programas</b><small>Escolha seu objetivo</small></button><button onClick={()=>go('library')}><Search/><b>Exercícios</b><small>Consultar biblioteca</small></button><button onClick={()=>go('custom')}><Save/><b>Meus treinos</b><small>Criar treino personalizado</small></button><button onClick={()=>go('history')}><History/><b>Histórico</b><small>{history.length} treino(s) salvo(s)</small></button><button onClick={()=>go('analysis')}><TrendingUp/><b>Análise</b><small>Veja sua evolução</small></button><button onClick={()=>go('weeklyReport')}><Save/><b>Relatório</b><small>Resumo semanal</small></button></div></section>{last&&<section className="lastWorkout"><b>Último treino</b><span>{last.programName} • {new Date(last.date).toLocaleDateString('pt-BR')}</span></section>}</main><BottomNav active="home" go={go}/></>}
+function Home({go,history,profile,cloud}){
+  const last=history[0];
+  const sessions=history.length;
+  const sets=history.reduce((sum,w)=>sum+(w.exercises||[]).reduce((s,e)=>s+(Number(e.sets)||0),0),0);
+  const volume=history.reduce((sum,w)=>sum+(w.exercises||[]).reduce((s,e)=>s+((Number(e.weight)||0)*(Number(e.reps)||0)*(Number(e.sets)||0)),0),0);
+  const recent=history.slice(0,4);
+  return <><Header title="App Treino"/>
+    <main className="page dashboardPage">
+      <CloudStatus cloud={cloud}/>
+      <section className="dashboardWelcome">
+        <div className="dashboardWelcomeCopy">
+          <span>PAINEL DO ATLETA</span>
+          <h2>Olá, {profile.name || 'Atleta'}.</h2>
+          <p>Seu treino, sua evolução e seu próximo passo em um só lugar.</p>
+        </div>
+        <div className="dashboardAvatar"><User size={25}/></div>
+      </section>
 
+      <section className="todayCard">
+        <div className="todayTop"><span>PRÓXIMO TREINO</span><b>HOJE</b></div>
+        <div className="todayBody">
+          <div className="todayIcon"><Dumbbell size={25}/></div>
+          <div><h3>Comece sua sessão</h3><p>Escolha um programa ou deixe o Personal Trainer montar sua sessão.</p></div>
+        </div>
+        <div className="todayActions">
+          <button className="primary" onClick={()=>go('programs')}><Play size={17}/> Começar treino</button>
+          <button className="todayCoach" onClick={()=>go('coach')}><TrendingUp size={17}/> Personal Trainer</button>
+        </div>
+      </section>
+
+      <section className="dashboardMetrics">
+        <article><span>TREINOS</span><strong>{sessions}</strong><small>registrados</small></article>
+        <article><span>SÉRIES</span><strong>{sets}</strong><small>executadas</small></article>
+        <article><span>VOLUME</span><strong>{volume>=1000?(volume/1000).toFixed(1)+'k':Math.round(volume)}</strong><small>kg registrados</small></article>
+      </section>
+
+      <section className="dashboardSection">
+        <div className="dashboardSectionHead"><div><span>ACESSO RÁPIDO</span><h3>O que você quer fazer?</h3></div></div>
+        <div className="dashboardActions">
+          <button onClick={()=>go('personalPlan')}><Dumbbell/><b>Meu plano</b><small>Montar treino automático</small><ChevronRight/></button>
+          <button onClick={()=>go('library')}><Search/><b>Exercícios</b><small>Consultar movimentos</small><ChevronRight/></button>
+          <button onClick={()=>go('history')}><History/><b>Histórico</b><small>Ver sessões anteriores</small><ChevronRight/></button>
+          <button onClick={()=>go('analysis')}><TrendingUp/><b>Evolução</b><small>Analisar desempenho</small><ChevronRight/></button>
+        </div>
+      </section>
+
+      <section className="dashboardSection">
+        <div className="dashboardSectionHead"><div><span>ATIVIDADE RECENTE</span><h3>Seu histórico</h3></div><button className="textAction" onClick={()=>go('history')}>Ver tudo</button></div>
+        {recent.length
+          ? <div className="recentList">{recent.map((w,i)=><button key={w.id||i} onClick={()=>go('history')}><div className="recentIcon"><CheckCircle2 size={17}/></div><div><b>{w.programName||'Treino'}</b><small>{new Date(w.date).toLocaleDateString('pt-BR')} • {(w.exercises||[]).length} exercícios</small></div><ChevronRight size={17}/></button>)}</div>
+          : <div className="dashboardEmpty"><History size={24}/><b>Seu histórico começa aqui</b><span>Registre o primeiro treino para acompanhar sua evolução.</span><button className="secondary" onClick={()=>go('programs')}>Escolher treino</button></div>}
+      </section>
+
+      <section className="coachTeaser">
+        <div><span>COACH IA</span><h3>Treine com acompanhamento inteligente</h3><p>Pré-treino, RPE série a série e ajustes automáticos para sua sessão.</p></div>
+        <button onClick={()=>go('coach')}><TrendingUp size={20}/><ChevronRight size={18}/></button>
+      </section>
+    </main>
+    <BottomNav active="home" go={go}/>
+  </>
+}
 function Library({go}){const [query,setQuery]=useState('');const [group,setGroup]=useState('Todos');const filtered=useMemo(()=>exercises.filter(e=>(group==='Todos'||e.group===group)&&e.name.toLowerCase().includes(query.toLowerCase())),[query,group]);return <><Header title="Exercícios" onBack={()=>go('home')}/><main className="page"><div className="searchBox"><Search size={19}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar exercício por nome"/></div><div className="filterTitle"><h3>Grupo muscular</h3><Filter size={18}/></div><div className="chips">{exerciseGroups.map(g=><button key={g} className={group===g?'chip active':'chip'} onClick={()=>setGroup(g)}>{g}</button>)}</div><p className="muted">{filtered.length} exercício(s) encontrado(s)</p><div className="cards">{filtered.map(e=><button className="programCard" key={e.id} onClick={()=>go('exercise',e)}><div className="programIcon"><Dumbbell size={22}/></div><div className="cardText"><h3>{e.name}</h3><span>{e.group} • {e.level}</span><p>{e.equipment}</p></div><ChevronRight/></button>)}</div>{filtered.length===0&&<div className="empty"><Search size={34}/><b>Nenhum exercício encontrado</b><span>Tente outro nome ou grupo muscular.</span></div>}</main><BottomNav active="library" go={go}/></>}
 
 function ExerciseAnimation({exercise}){
