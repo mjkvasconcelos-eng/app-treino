@@ -1,0 +1,2 @@
+export const exercises=[{id:'agachamento',name:'Agachamento livre',muscle:'Pernas',sets:3,reps:'8–12'},{id:'supino',name:'Supino reto',muscle:'Peito',sets:3,reps:'8–12'},{id:'remada',name:'Remada baixa',muscle:'Costas',sets:3,reps:'8–12'},{id:'desenvolvimento',name:'Desenvolvimento',muscle:'Ombros',sets:3,reps:'8–12'},{id:'puxada',name:'Puxada frontal',muscle:'Costas',sets:3,reps:'8–12'},{id:'stiff',name:'Stiff',muscle:'Posterior',sets:3,reps:'8–12'}];
+export const plans=[{id:'full-a',name:'Full Body A',frequency:'3x por semana',duration:'45–60 min'}];
