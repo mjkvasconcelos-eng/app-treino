@@ -41,5 +41,11 @@ npm run dev
 
 Nunca coloque credenciais administrativas ou chaves privadas no frontend. As variáveis `VITE_*` são configurações públicas do app Web; a segurança dos dados deve ser feita pelas regras do Firestore.
 
+## V4 - biblioteca de exercícios
+- Biblioteca com exercícios organizados por grupo muscular
+- Busca por nome
+- Filtros por grupo muscular
+- Tela de detalhes com equipamento, nível, descrição, execução e dicas
+
 ## Próximas versões
 Autenticação por e-mail/Google, biblioteca de exercícios com vídeos, planos por objetivo, gráficos de carga e publicação mobile.
