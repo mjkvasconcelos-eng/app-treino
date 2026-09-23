@@ -17,5 +17,29 @@ npm install
 npm run dev
 ```
 
+## V2 já implementada
+- Cronômetro de descanso
+- Registro de carga e repetições
+- Séries concluídas
+- Histórico e evolução
+- Perfil
+- Persistência local
+
+## V3 - sincronização Firebase
+- Sincronização opcional com Firestore
+- Autenticação anônima para identificar o dispositivo/usuário
+- Perfil e histórico salvos na nuvem quando Firebase estiver configurado
+- O app continua funcionando em modo local quando as variáveis Firebase não estão configuradas
+
+### Configurar Firebase
+1. Crie um projeto no Firebase.
+2. Ative Authentication > Sign-in method > Anonymous.
+3. Crie/ative o Firestore Database.
+4. Copie `.env.example` para `.env.local`.
+5. Preencha as variáveis `VITE_FIREBASE_*` com a configuração do seu app Web.
+6. Execute `npm install` e `npm run dev`.
+
+Nunca coloque credenciais administrativas ou chaves privadas no frontend. As variáveis `VITE_*` são configurações públicas do app Web; a segurança dos dados deve ser feita pelas regras do Firestore.
+
 ## Próximas versões
-Cronômetro de descanso, histórico persistente, autenticação, Firestore, biblioteca de exercícios com vídeos e planos por objetivo.
+Autenticação por e-mail/Google, biblioteca de exercícios com vídeos, planos por objetivo, gráficos de carga e publicação mobile.
