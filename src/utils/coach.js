@@ -81,9 +81,25 @@ export function buildCoachPlan(history,profile){
     return {day:dayIndex+1,title,exercises:items,duration:goal==='Força'?'40–55 min':goal==='Hipertrofia'?'45–60 min':'30–45 min'};
   });
 
+  const recentRpe=analysis.avgRpe||0;
+  const readiness=recentRpe>=9?'Recuperação prioritária':recentRpe>=8?'Treinar com autorregulação':'Pronto para progressão gradual';
+  const readinessScore=recentRpe>=9?55:recentRpe>=8?72:analysis.adherence>=80?92:82;
+  const sessionRules={
+    warmup:'5–10 min de aquecimento geral + 1–3 séries de aproximação nos exercícios principais.',
+    effort:'Na maioria das séries, termine com 1–3 repetições em reserva; evite transformar todas as séries em esforço máximo.',
+    progression:'Quando completar a meta com técnica consistente e esforço moderado, aumente a carga de forma pequena ou acrescente repetições — não as duas coisas de uma vez.',
+    recovery:'Se o desempenho cair junto com RPE muito alto, reduza carga/volume e priorize recuperação.'
+  };
+  const methodology=[
+    'Individualização por objetivo, nível, frequência, histórico e equipamento.',
+    'Progressão gradual orientada por desempenho e RPE.',
+    'Consistência e treino dos grandes grupos musculares como base.',
+    'Ajustes de volume e carga quando aparecem sinais de fadiga.'
+  ];
   return {
     name:'Coach IA • Próxima semana',
     goal,level,days,nextWeek,
+    readiness,readinessScore,sessionRules,methodology,
     summary:highFatigue?'O coach priorizou recuperação porque a dificuldade recente ficou alta.':volumeJump?'O coach segurou progressões porque o volume aumentou bastante na semana anterior.':'O coach combinou histórico de desempenho, RPE, consistência e estagnação para definir progressões graduais.',
     analysis
   };
