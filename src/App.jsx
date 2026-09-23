@@ -11,6 +11,7 @@ import {buildCoachPlan} from './utils/coach';
 import {buildWeeklyReport} from './utils/weeklyReport';
 import {buildReportTimeline} from './utils/reportTimeline';
 import CloudStatus from './components/CloudStatus';
+import Exercise3DDemo from './components/Exercise3DDemo';
 
 function Header({title,onBack}){return <header className="header">{onBack?<button className="iconBtn" onClick={onBack}><ArrowLeft size={22}/></button>:<div className="logoMark">AT</div>}<h1>{title}</h1><div style={{width:40}}/></header>}
 
@@ -18,53 +19,7 @@ function Home({go,history,profile,cloud}){const last=history[0];return <><Header
 
 function Library({go}){const [query,setQuery]=useState('');const [group,setGroup]=useState('Todos');const filtered=useMemo(()=>exercises.filter(e=>(group==='Todos'||e.group===group)&&e.name.toLowerCase().includes(query.toLowerCase())),[query,group]);return <><Header title="Exercícios" onBack={()=>go('home')}/><main className="page"><div className="searchBox"><Search size={19}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar exercício por nome"/></div><div className="filterTitle"><h3>Grupo muscular</h3><Filter size={18}/></div><div className="chips">{exerciseGroups.map(g=><button key={g} className={group===g?'chip active':'chip'} onClick={()=>setGroup(g)}>{g}</button>)}</div><p className="muted">{filtered.length} exercício(s) encontrado(s)</p><div className="cards">{filtered.map(e=><button className="programCard" key={e.id} onClick={()=>go('exercise',e)}><div className="programIcon"><Dumbbell size={22}/></div><div className="cardText"><h3>{e.name}</h3><span>{e.group} • {e.level}</span><p>{e.equipment}</p></div><ChevronRight/></button>)}</div>{filtered.length===0&&<div className="empty"><Search size={34}/><b>Nenhum exercício encontrado</b><span>Tente outro nome ou grupo muscular.</span></div>}</main><BottomNav active="library" go={go}/></>}
 
-function ExerciseAnimation({exercise}){
-  const [playing,setPlaying]=useState(true);
-  const id=exercise.id;
-  const configs={
-    agachamento:{title:'Agachamento',cue:'Quadril para trás • joelhos acompanham os pés',tag:'PERNAS',type:'squat',steps:['Fique firme','Desça controlando','Suba empurrando o chão']},
-    legpress:{title:'Leg Press',cue:'Desça até uma amplitude confortável • empurre pela plataforma',tag:'MÁQUINA',type:'legpress',steps:['Ajuste o banco','Desça com controle','Empurre sem travar']},
-    supino:{title:'Supino',cue:'Escápulas firmes • barra desce em direção ao peito',tag:'PEITO',type:'bench',steps:['Posicione-se','Desça a barra','Empurre para cima']},
-    supinoinclinado:{title:'Supino Inclinado',cue:'Banco inclinado • cotovelos sob controle durante a subida',tag:'PEITO',type:'incline',steps:['Ajuste o banco','Desça os halteres','Pressione acima']},
-    remada:{title:'Remada',cue:'Puxe os cotovelos para trás • mantenha o tronco estável',tag:'COSTAS',type:'row',steps:['Incline o tronco','Puxe os cotovelos','Retorne devagar']},
-    puxada:{title:'Puxada',cue:'Puxe a barra ao alto do peito • ombros longe das orelhas',tag:'COSTAS',type:'latpull',steps:['Estenda os braços','Puxe para o peito','Controle a subida']},
-    desenvolvimento:{title:'Desenvolvimento',cue:'Empurre os halteres acima da cabeça sem perder a postura',tag:'OMBROS',type:'shoulder',steps:['Comece na altura dos ombros','Empurre para cima','Desça com controle']},
-    rosca:{title:'Rosca Direta',cue:'Cotovelos próximos ao corpo • mova apenas o antebraço',tag:'BÍCEPS',type:'curl',steps:['Braços estendidos','Flexione os cotovelos','Desça lentamente']},
-    triceps:{title:'Tríceps na Polia',cue:'Cotovelos fixos • empurre a barra até estender os braços',tag:'TRÍCEPS',type:'pushdown',steps:['Cotovelos alinhados','Empurre para baixo','Retorne sem balanço']},
-    crucifixo:{title:'Crucifixo',cue:'Abra os braços com leve flexão • feche contraindo o peito',tag:'PEITO',type:'fly',steps:['Braços abertos','Aproxime as mãos','Abra controlando']},
-    abdominal:{title:'Abdominal',cue:'Contraia o abdômen • não puxe a cabeça com as mãos',tag:'CORE',type:'crunch',steps:['Ative o abdômen','Suba o tronco','Retorne lentamente']},
-    elevacao:{title:'Elevação Lateral',cue:'Eleve os braços até próximo da linha dos ombros',tag:'OMBROS',type:'lateral',steps:['Halteres ao lado','Eleve lateralmente','Desça controlando']}
-  };
-  const c=configs[id]||configs.agachamento;
-  return <section className="exerciseDemo premiumDemo">
-    <div className="exerciseDemoHead">
-      <div><span>DEMO VISUAL • {c.tag}</span><h3>{c.title}</h3></div>
-      <button className={playing?'demoToggle active':'demoToggle'} onClick={()=>setPlaying(v=>!v)}>{playing?'Pausar':'Reproduzir'} <Play size={15}/></button>
-    </div>
-    <div className={(playing?'motionStage premiumStage demo-':'motionStage paused premiumStage demo-')+c.type}>
-      <div className="demoGrid"/>
-      <div className="demoBadge">MOVIMENTO • LOOP</div>
-      <div className="motionGlow"/>
-      <svg viewBox="0 0 360 240" role="img" aria-label={'Demonstração animada de '+exercise.name}>
-        <g className="sceneFigure">
-          <circle className="sceneHead" cx="180" cy="48" r="16"/>
-          <path className="sceneTorso" d="M180 66 Q165 90 168 116 Q180 126 192 116 Q195 90 180 66Z"/>
-          <path className="sceneArm armL" d="M169 76 L128 105 L112 142"/>
-          <path className="sceneArm armR" d="M191 76 L232 105 L248 142"/>
-          <path className="sceneLeg legL" d="M174 116 L142 166 L126 207"/>
-          <path className="sceneLeg legR" d="M186 116 L218 166 L234 207"/>
-          <circle className="sceneJoint" cx="128" cy="105" r="5"/><circle className="sceneJoint" cx="232" cy="105" r="5"/>
-          <circle className="sceneJoint" cx="142" cy="166" r="5"/><circle className="sceneJoint" cx="218" cy="166" r="5"/>
-          <g className="equipmentGroup"><path d="M88 142 H272"/><path d="M96 134 V150 M264 134 V150"/></g>
-          <g className="exerciseProps"><circle cx="112" cy="142" r="8"/><circle cx="248" cy="142" r="8"/></g>
-        </g>
-        <path className="motionPath" d="M55 202 Q180 176 305 202"/>
-      </svg>
-      <div className="motionCue"><b>{c.cue}</b><span>Observe uma repetição completa antes de iniciar.</span></div>
-    </div>
-    <div className="motionSteps">{c.steps.map((s,i)=><span key={s}><b>{i+1}</b>{s}</span>)}</div>
-  </section>
-}
+function ExerciseAnimation({exercise}){return <Exercise3DDemo exercise={exercise}/>}
 
 function ExerciseDetails({exercise,go}){return <><Header title="Detalhes do exercício" onBack={()=>go('library')}/><main className="page">
   <section className="exerciseHero"><div className="exerciseHeroIcon"><Dumbbell size={34}/></div><span>{exercise.group}</span><h2>{exercise.name}</h2><p>{exercise.description}</p><div className="exerciseMeta"><b>{exercise.level}</b><b>{exercise.equipment}</b></div></section>
