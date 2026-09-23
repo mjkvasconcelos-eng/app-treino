@@ -20,32 +20,49 @@ function Library({go}){const [query,setQuery]=useState('');const [group,setGroup
 
 function ExerciseAnimation({exercise}){
   const [playing,setPlaying]=useState(true);
-  const movementClass=`motion-${exercise.id}`;
-  return <section className="exerciseDemo">
+  const id=exercise.id;
+  const configs={
+    agachamento:{title:'Agachamento',cue:'Quadril para trás • joelhos acompanham os pés',tag:'PERNAS',type:'squat',steps:['Fique firme','Desça controlando','Suba empurrando o chão']},
+    legpress:{title:'Leg Press',cue:'Desça até uma amplitude confortável • empurre pela plataforma',tag:'MÁQUINA',type:'legpress',steps:['Ajuste o banco','Desça com controle','Empurre sem travar']},
+    supino:{title:'Supino',cue:'Escápulas firmes • barra desce em direção ao peito',tag:'PEITO',type:'bench',steps:['Posicione-se','Desça a barra','Empurre para cima']},
+    supinoinclinado:{title:'Supino Inclinado',cue:'Banco inclinado • cotovelos sob controle durante a subida',tag:'PEITO',type:'incline',steps:['Ajuste o banco','Desça os halteres','Pressione acima']},
+    remada:{title:'Remada',cue:'Puxe os cotovelos para trás • mantenha o tronco estável',tag:'COSTAS',type:'row',steps:['Incline o tronco','Puxe os cotovelos','Retorne devagar']},
+    puxada:{title:'Puxada',cue:'Puxe a barra ao alto do peito • ombros longe das orelhas',tag:'COSTAS',type:'latpull',steps:['Estenda os braços','Puxe para o peito','Controle a subida']},
+    desenvolvimento:{title:'Desenvolvimento',cue:'Empurre os halteres acima da cabeça sem perder a postura',tag:'OMBROS',type:'shoulder',steps:['Comece na altura dos ombros','Empurre para cima','Desça com controle']},
+    rosca:{title:'Rosca Direta',cue:'Cotovelos próximos ao corpo • mova apenas o antebraço',tag:'BÍCEPS',type:'curl',steps:['Braços estendidos','Flexione os cotovelos','Desça lentamente']},
+    triceps:{title:'Tríceps na Polia',cue:'Cotovelos fixos • empurre a barra até estender os braços',tag:'TRÍCEPS',type:'pushdown',steps:['Cotovelos alinhados','Empurre para baixo','Retorne sem balanço']},
+    crucifixo:{title:'Crucifixo',cue:'Abra os braços com leve flexão • feche contraindo o peito',tag:'PEITO',type:'fly',steps:['Braços abertos','Aproxime as mãos','Abra controlando']},
+    abdominal:{title:'Abdominal',cue:'Contraia o abdômen • não puxe a cabeça com as mãos',tag:'CORE',type:'crunch',steps:['Ative o abdômen','Suba o tronco','Retorne lentamente']},
+    elevacao:{title:'Elevação Lateral',cue:'Eleve os braços até próximo da linha dos ombros',tag:'OMBROS',type:'lateral',steps:['Halteres ao lado','Eleve lateralmente','Desça controlando']}
+  };
+  const c=configs[id]||configs.agachamento;
+  return <section className="exerciseDemo premiumDemo">
     <div className="exerciseDemoHead">
-      <div><span>GUIA VISUAL</span><h3>Veja o movimento</h3></div>
+      <div><span>DEMO VISUAL • {c.tag}</span><h3>{c.title}</h3></div>
       <button className={playing?'demoToggle active':'demoToggle'} onClick={()=>setPlaying(v=>!v)}>{playing?'Pausar':'Reproduzir'} <Play size={15}/></button>
     </div>
-    <div className={playing?`motionStage ${movementClass}`:`motionStage paused ${movementClass}`}>
+    <div className={(playing?'motionStage premiumStage demo-':'motionStage paused premiumStage demo-')+c.type}>
+      <div className="demoGrid"/>
+      <div className="demoBadge">MOVIMENTO • LOOP</div>
       <div className="motionGlow"/>
-      <svg viewBox="0 0 320 210" role="img" aria-label={`Animação demonstrativa de ${exercise.name}`}>
-        <defs>
-          <linearGradient id="bodyGrad" x1="0" x2="1"><stop offset="0%" stopColor="#d1d5db"/><stop offset="100%" stopColor="#ffffff"/></linearGradient>
-        </defs>
-        <g className="motionFigure">
-          <circle className="motionHead" cx="160" cy="38" r="15"/>
-          <path className="motionBody" d="M160 55 L160 112 M160 68 L116 88 M160 68 L204 88 M160 112 L132 170 M160 112 L188 170"/>
-          <circle className="motionJoint" cx="116" cy="88" r="5"/><circle className="motionJoint" cx="204" cy="88" r="5"/>
-          <circle className="motionJoint" cx="132" cy="170" r="5"/><circle className="motionJoint" cx="188" cy="170" r="5"/>
-          <path className="motionFloor" d="M70 184 H250"/>
-          <path className="motionEquipment" d="M92 87 H228 M100 80 V94 M220 80 V94"/>
+      <svg viewBox="0 0 360 240" role="img" aria-label={'Demonstração animada de '+exercise.name}>
+        <g className="sceneFigure">
+          <circle className="sceneHead" cx="180" cy="48" r="16"/>
+          <path className="sceneTorso" d="M180 66 Q165 90 168 116 Q180 126 192 116 Q195 90 180 66Z"/>
+          <path className="sceneArm armL" d="M169 76 L128 105 L112 142"/>
+          <path className="sceneArm armR" d="M191 76 L232 105 L248 142"/>
+          <path className="sceneLeg legL" d="M174 116 L142 166 L126 207"/>
+          <path className="sceneLeg legR" d="M186 116 L218 166 L234 207"/>
+          <circle className="sceneJoint" cx="128" cy="105" r="5"/><circle className="sceneJoint" cx="232" cy="105" r="5"/>
+          <circle className="sceneJoint" cx="142" cy="166" r="5"/><circle className="sceneJoint" cx="218" cy="166" r="5"/>
+          <g className="equipmentGroup"><path d="M88 142 H272"/><path d="M96 134 V150 M264 134 V150"/></g>
+          <g className="exerciseProps"><circle cx="112" cy="142" r="8"/><circle cx="248" cy="142" r="8"/></g>
         </g>
+        <path className="motionPath" d="M55 202 Q180 176 305 202"/>
       </svg>
-      <div className="motionCue"><b>Movimento controlado</b><span>Evite impulso e mantenha a técnica.</span></div>
+      <div className="motionCue"><b>{c.cue}</b><span>Observe uma repetição completa antes de iniciar.</span></div>
     </div>
-    <div className="motionSteps">
-      <span><b>1</b>Posição inicial</span><span><b>2</b>Execute com controle</span><span><b>3</b>Retorne lentamente</span>
-    </div>
+    <div className="motionSteps">{c.steps.map((s,i)=><span key={s}><b>{i+1}</b>{s}</span>)}</div>
   </section>
 }
 
