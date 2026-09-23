@@ -1,6 +1,6 @@
-import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import { getAuth, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDREdq56SV_HVhyC_t40OvazuAK2TaX1go",
@@ -12,7 +12,18 @@ const firebaseConfig = {
   measurementId: "G-H0VN7ZGJZQ",
 };
 
-export const firebaseConfigured = true;
-export const app = getApps()[0] ?? initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+let firebaseConfigured = false;
+
+try {
+  app = getApps()[0] ?? initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  firebaseConfigured = true;
+} catch (error) {
+  console.error('Firebase não pôde ser inicializado. O app continuará em modo local.', error);
+}
+
+export { app, auth, db, firebaseConfigured };
