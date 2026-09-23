@@ -35,7 +35,26 @@ export default function App(){
   const nextLogs=[...sessionLogs,log]; setSessionLogs(nextLogs); setSeriesDone(true);if(currentSet<exercises[currentExercise].sets){setCurrentSet(v=>v+1);setFinished(false);setRemaining(rest);setRunning(true);setWeight(0);setReps(0);setNotes('')}else if(currentExercise<exercises.length-1){setCurrentExercise(v=>v+1);setCurrentSet(1);setFinished(false);setRemaining(rest);setRunning(true);setWeight(0);setReps(0);setNotes('')}else{const record:WorkoutHistory={id:Date.now().toString(),date:new Date().toISOString(),plan:plan.name,sets:nextLogs};const nextHistory=[record,...history];setHistory(nextHistory);localStorage.setItem(HISTORY_KEY,JSON.stringify(nextHistory)); if(authUser) saveWorkout(authUser.uid,record).catch(()=>setAuthError('Treino salvo no aparelho, mas não foi possível sincronizar com a nuvem.')); setActive(false);setSeriesDone(false);setFinished(true);setSessionLogs([]);}};
  const startWorkout=()=>{setActive(true);setCurrentExercise(0);setCurrentSet(1);setSeriesDone(false);setFinished(false);setRunning(false);setRemaining(rest);setSessionLogs([]);setWeight(0);setReps(0);setNotes('')};
  const current=exercises[currentExercise];
- if(firebaseConfigured&&!authUser) return <div className="auth-screen"><div className="auth-card"><div className="big-avatar"><Dumbbell size={30}/></div><span className="eyebrow">APP TREINO</span><h1>{authMode==='login'?'Entrar na sua conta':'Criar sua conta'}</h1><p>Sincronize seus treinos, histórico e evolução entre dispositivos.</p><form onSubmit={submitAuth}><label>E-mail<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="voce@email.com"/></label><label>Senha<input type="password" required minLength={6} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Mínimo de 6 caracteres"/></label>{authError&&<div className="auth-error">{authError}</div>}<button className="primary full" disabled={authBusy}>{authBusy?'Aguarde...':authMode==='login'?'Entrar':'Criar conta'}</button></form><button className="link-button" onClick={()=>{setAuthMode(authMode==='login'?'register':'login');setAuthError('')}}>{authMode==='login'?'Ainda não tenho conta':'Já tenho uma conta'}</button></div></div>; return <div className="app">
+ if(firebaseConfigured&&!authUser){
+  return (
+   <div className="auth-screen">
+    <div className="auth-card">
+     <div className="big-avatar"><Dumbbell size={30}/></div>
+     <span className="eyebrow">APP TREINO</span>
+     <h1>{authMode==='login'?'Entrar na sua conta':'Criar sua conta'}</h1>
+     <p>Sincronize seus treinos, histórico e evolução entre dispositivos.</p>
+     <form onSubmit={submitAuth}>
+      <label>E-mail<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="voce@email.com"/></label>
+      <label>Senha<input type="password" required minLength={6} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Mínimo de 6 caracteres"/></label>
+      {authError&&<div className="auth-error">{authError}</div>}
+      <button className="primary full" disabled={authBusy}>{authBusy?'Aguarde...':authMode==='login'?'Entrar':'Criar conta'}</button>
+     </form>
+     <button className="link-button" onClick={()=>{setAuthMode(authMode==='login'?'register':'login');setAuthError('')}}>{authMode==='login'?'Ainda não tenho conta':'Já tenho uma conta'}</button>
+    </div>
+   </div>
+  );
+ }
+ return <div className="app">
   <header><div><span className="eyebrow">APP TREINO</span><h1>Seu treino, sua evolução.</h1></div><div className="avatar">{authUser?.email?.[0]?.toUpperCase()||'M'}</div></header>
   {tab==='home'&&<main><section className="hero"><div><span>Treino de hoje</span><h2>{plan.name}</h2><p>{plan.frequency} • {plan.duration}</p></div><button onClick={()=>setTab('treino')}><Play size={18} fill="currentColor"/> Começar</button></section>
    <div className="stats"><div><Flame/><b>0</b><small>dias seguidos</small></div><div><Dumbbell/><b>{exercises.length}</b><small>exercícios</small></div><div><BarChart3/><b>0 kg</b><small>volume registrado</small></div></div>
