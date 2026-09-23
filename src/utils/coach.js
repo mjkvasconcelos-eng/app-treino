@@ -88,3 +88,63 @@ export function buildCoachPlan(history,profile){
     analysis
   };
 }
+
+
+export const preWorkoutQuestions=[
+  {id:'sleep',title:'Como foi seu sono?',options:[
+    {value:1,label:'Muito ruim',effect:'Reduzir carga e volume; priorizar técnica e recuperação.'},
+    {value:2,label:'Ruim',effect:'Reduzir levemente a carga e manter mais descanso entre séries.'},
+    {value:3,label:'Regular',effect:'Manter a sessão, sem progressão agressiva de carga.'},
+    {value:4,label:'Bom',effect:'Manter o plano previsto.'},
+    {value:5,label:'Muito bom',effect:'Sessão normal; progressão só se a execução e o esforço permitirem.'}
+  ]},
+  {id:'energy',title:'Como está sua energia agora?',options:[
+    {value:1,label:'Muito baixa',effect:'Reduzir volume e carga; sessão mais curta.'},
+    {value:2,label:'Baixa',effect:'Reduzir um pouco a carga e evitar progressão hoje.'},
+    {value:3,label:'Normal',effect:'Seguir a sessão planejada.'},
+    {value:4,label:'Boa',effect:'Seguir o plano e progredir apenas onde houver margem.'},
+    {value:5,label:'Muito boa',effect:'Sessão normal; progressão gradual pode ser considerada.'}
+  ]},
+  {id:'soreness',title:'Como está a dor muscular pós-treino?',options:[
+    {value:1,label:'Nenhuma',effect:'Sem ajuste por este fator.'},
+    {value:2,label:'Leve',effect:'Manter a sessão; faça aquecimento e observe a resposta do corpo.'},
+    {value:3,label:'Moderada',effect:'Reduzir volume e evitar aumentar carga no grupo muscular afetado.'},
+    {value:4,label:'Forte',effect:'Reduzir bastante o estímulo ou priorizar recuperação; não forçar a região.'},
+    {value:5,label:'Muito forte',effect:'Não insistir no treino da região; priorizar recuperação e avaliação se persistir.'}
+  ]},
+  {id:'recovery',title:'Como você avalia sua recuperação geral?',options:[
+    {value:1,label:'Muito ruim',effect:'Sessão de recuperação: menor carga/volume e mais descanso.'},
+    {value:2,label:'Ruim',effect:'Reduzir carga e volume e aumentar os intervalos.'},
+    {value:3,label:'Regular',effect:'Manter o treino sem progressão agressiva.'},
+    {value:4,label:'Boa',effect:'Seguir o planejamento.'},
+    {value:5,label:'Excelente',effect:'Seguir o planejamento; progressão gradual somente com boa técnica.'}
+  ]},
+  {id:'pain',title:'Você sente dor aguda ou incomum durante algum movimento?',options:[
+    {value:0,label:'Não',effect:'Sem bloqueio de segurança por dor.'},
+    {value:1,label:'Leve',effect:'Não forçar o movimento; reduzir carga/amplitude e observar a resposta.'},
+    {value:2,label:'Moderada',effect:'Não executar o movimento doloroso; considerar substituição e orientação profissional.'},
+    {value:3,label:'Forte',effect:'Interromper a sessão e procurar avaliação profissional, especialmente se a dor for intensa ou preocupante.'}
+  ]}
+];
+
+export function buildPreWorkoutAdjustment(answers={},session){
+  const sleep=Number(answers.sleep)||3;
+  const energy=Number(answers.energy)||3;
+  const soreness=Number(answers.soreness)||1;
+  const recovery=Number(answers.recovery)||3;
+  const pain=Number(answers.pain)||0;
+  if(pain>=3)return {status:'pausar',score:0,loadMultiplier:0,setsMultiplier:0,restMultiplier:1,title:'Treino pausado por segurança',summary:'A resposta indica dor forte ou preocupante. O app não tenta diagnosticar a causa; interrompa a sessão e procure avaliação profissional.',session:null,details:{pain:preWorkoutQuestions[4].options[3].effect}};
+  const score=Math.round(((sleep/5)*20)+((energy/5)*30)+(((6-soreness)/5)*20)+((recovery/5)*30));
+  let loadMultiplier=1,setsMultiplier=1,restMultiplier=1,status='normal',title='Pronto para treinar',summary='Mantenha a sessão planejada e ajuste apenas se a execução ou o esforço indicarem necessidade.';
+  if(pain===2||score<55){status='recuperacao';loadMultiplier=.85;setsMultiplier=.75;restMultiplier=1.3;title='Sessão de recuperação';summary='Hoje o coach reduz o estímulo para controlar fadiga e preservar a qualidade do treino.'}
+  else if(pain===1||score<70){status='moderado';loadMultiplier=.95;setsMultiplier=.85;restMultiplier=1.2;title='Treino com autorregulação';summary='O coach reduz levemente o estímulo e aumenta o descanso. Evite progressão de carga hoje.'}
+  else if(score<82){status='controlado';loadMultiplier=.98;setsMultiplier=1;restMultiplier=1.1;title='Treino controlado';summary='A sessão segue o plano, mas com margem extra de recuperação e sem progressão agressiva.'}
+  const session=Array.isArray(session?.exercises)?{...session,exercises:session.exercises.map(e=>{const baseWeight=Number(e.weight)||0;const sets=Math.max(1,Math.round((Number(e.sets)||1)*setsMultiplier));const weight=baseWeight?roundWeight(baseWeight*loadMultiplier):0;const rest=Math.round((Number(e.rest)||60)*restMultiplier);return {...e,sets,weight,rest,action:status==='normal'?e.action:'reduzir'}})}:null;
+  return {status,score,loadMultiplier,setsMultiplier,restMultiplier,title,summary,session,details:{
+    sleep:preWorkoutQuestions[0].options.find(x=>x.value===sleep)?.effect,
+    energy:preWorkoutQuestions[1].options.find(x=>x.value===energy)?.effect,
+    soreness:preWorkoutQuestions[2].options.find(x=>x.value===soreness)?.effect,
+    recovery:preWorkoutQuestions[3].options.find(x=>x.value===recovery)?.effect,
+    pain:preWorkoutQuestions[4].options.find(x=>x.value===pain)?.effect
+  }};
+}
