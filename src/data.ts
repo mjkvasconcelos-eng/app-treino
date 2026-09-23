@@ -39,4 +39,4 @@ export const plans=[
 ]}
 ];
 
-export const workoutDays=(plan:any)=>plan.days.map(day=>({...day,exercises:day.exercises.map(([exerciseId,sets,reps,rest])=>({exerciseId,sets,reps,rest}))}));
+export const workoutDays=(plan:any):WorkoutDay[]=>plan.days.map((day:any)=>({...day,exercises:day.exercises.map(([exerciseId,sets,reps,rest]:[string,number,string,number])=>({exerciseId,sets,reps,rest}))}));
