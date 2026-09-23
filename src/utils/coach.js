@@ -164,3 +164,49 @@ export function buildPreWorkoutAdjustment(answers={},session){
     pain:preWorkoutQuestions[4].options.find(x=>x.value===pain)?.effect
   }};
 }
+
+
+export function adjustNextSet({weight=0,reps=0,targetReps=10,rpe=7,rest=90}={}){
+  const w=Number(weight)||0;
+  const actualReps=Number(reps)||0;
+  const target=Number(targetReps)||10;
+  const effort=Number(rpe)||7;
+  let nextWeight=w;
+  let nextReps=target;
+  let nextRest=Number(rest)||90;
+  let action='manter';
+  let reason='RPE moderado: mantenha a carga e busque repetir a execução com técnica consistente.';
+
+  if(effort>=10){
+    nextWeight=w?roundWeight(w*.90):0;
+    nextReps=Math.max(1,Math.min(target,actualReps-1||target-1));
+    nextRest=Math.round(nextRest*1.35);
+    action='reduzir';
+    reason='RPE 10: reduzo a carga e aumento o descanso para controlar o esforço na próxima série.';
+  }else if(effort>=9){
+    nextWeight=w?roundWeight(w*.95):0;
+    nextReps=Math.max(1,Math.min(target,actualReps||target));
+    nextRest=Math.round(nextRest*1.25);
+    action='reduzir';
+    reason='RPE muito alto: reduzo levemente a carga e aumento o descanso.';
+  }else if(effort>=8){
+    nextWeight=w?roundWeight(w*.975):0;
+    nextReps=Math.max(1,Math.min(target,actualReps||target));
+    nextRest=Math.round(nextRest*1.15);
+    action='reduzir';
+    reason='RPE alto: pequena redução de carga e mais descanso antes da próxima série.';
+  }else if(effort<=5&&actualReps>=target&&w>0){
+    nextWeight=roundWeight(w*1.025);
+    nextReps=target;
+    nextRest=Math.max(45,Math.round(nextRest*.95));
+    action='aumentar';
+    reason='RPE baixo com a meta cumprida: aumento pequeno de carga para a próxima série.';
+  }else if(effort<=6&&actualReps>=target){
+    nextWeight=w;
+    nextReps=Math.min(target+1,15);
+    action='progredir';
+    reason='RPE confortável: mantenha a carga e tente uma repetição a mais, se a técnica estiver sólida.';
+  }
+
+  return {weight:nextWeight,reps:nextReps,rest:nextRest,action,reason};
+}
