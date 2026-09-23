@@ -7,16 +7,7 @@ const baseExercises={
   core:[{id:'abdominal',name:'Abdominal curto',muscle:'Abdômen'}]
 };
 const homeFallback={legs:baseExercises.legs[0],chest:baseExercises.chest[0],back:baseExercises.back[0],shoulders:baseExercises.shoulders[1],arms:baseExercises.arms[0],core:baseExercises.core[0]};
-function allowed(item,equipment){
-  const e=(equipment||[]).join(' ').toLowerCase();
-  if(!e||e.includes('academia'))return true;
-  if(e.includes('peso corporal')&&item.id==='abdominal')return true;
-  if(e.includes('halteres')&&['desenvolvimento','elevacao','rosca','remada','supinoinclinado'].includes(item.id))return true;
-  if(e.includes('barra')&&['agachamento','supino','rosca'].some(x=>item.id.startsWith(x)))return true;
-  if(e.includes('cabos')&&['puxada','triceps'].includes(item.id))return true;
-  if(e.includes('máquinas')&&item.id==='legpress')return true;
-  return false;
-}
+function allowed(item,equipment){const list=equipment||[];if(list.includes('Academia'))return true;const e=list.map(x=>x.toLowerCase());const id=item.id;if(e.includes('peso corporal'))return id==='abdominal';if(e.includes('halteres'))return ['desenvolvimento','elevacao','rosca','remada','supinoinclinado'].includes(id);if(e.includes('barra'))return ['agachamento','supino','rosca'].includes(id);if(e.includes('cabos'))return ['puxada','triceps'].includes(id);if(e.includes('máquinas'))return id==='legpress';return false;}
 function pick(group,equipment){const found=baseExercises[group].find(x=>allowed(x,equipment));return found||homeFallback[group]||baseExercises[group][0]}
 function makeExercise(group,equipment,sets,reps,rest){const x=pick(group,equipment);return {...x,sets,reps,rest}}
 export function buildPersonalPlan(input){
