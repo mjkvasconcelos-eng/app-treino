@@ -113,7 +113,62 @@ function Details({program,go}){return <><Header title={program.name} onBack={()=
 
 function RestTimer({seconds}){const [remaining,setRemaining]=useState(seconds);const [running,setRunning]=useState(false);useEffect(()=>{if(!running)return;const id=setInterval(()=>setRemaining(v=>{if(v<=1){setRunning(false);return 0}return v-1}),1000);return()=>clearInterval(id)},[running]);useEffect(()=>{setRemaining(seconds);setRunning(false)},[seconds]);return <div className="timerBox"><div><Timer size={18}/><b>{String(Math.floor(remaining/60)).padStart(2,'0')}:{String(remaining%60).padStart(2,'0')}</b></div><button onClick={()=>setRunning(v=>!v)}>{running?<Pause size={17}/>:<Play size={17}/>}</button><button onClick={()=>{setRunning(false);setRemaining(seconds)}}><RotateCcw size={17}/></button></div>}
 
-function Workout({program,go,saveWorkout}){const [index,setIndex]=useState(0);const [series,setSeries]=useState({});const [current,setCurrent]=useState({weight:'',reps:''});const ex=program.exercises[index];const completed=series[ex.id]||0;const last=index===program.exercises.length-1;const progress=Math.round(((index+completed/ex.sets)/program.exercises.length)*100);const finish=()=>{saveWorkout({id:Date.now(),date:new Date().toISOString(),programId:program.id,programName:program.name,minutes:parseInt(program.duration),exercises:Object.entries(series).map(([exerciseId,sets])=>({exerciseId,sets}))});go('done',program)};const addSet=()=>{if(completed>=ex.sets)return;setSeries(s=>({...s,[ex.id]:completed+1}));setCurrent({weight:'',reps:''});};return <><Header title="Treino" onBack={()=>go('details',program)}/><main className="page"><div className="progressLabel"><span>Exercício {index+1} de {program.exercises.length}</span><b>{Math.min(progress,100)}%</b></div><div className="progress"><div style={{width:Math.min(progress,100)+'%'}}/></div><section className="workoutCard"><span>{ex.muscle}</span><h2>{ex.name}</h2><div className="stats"><div><b>{ex.sets}</b><small>Séries</small></div><div><b>{ex.reps}</b><small>Repetições</small></div><div><b>{ex.rest}s</b><small>Descanso</small></div></div></section><div className="setPanel"><h3>Registrar série {completed+1} de {ex.sets}</h3><div className="formGrid"><label>Carga (kg)<input inputMode="decimal" value={current.weight} onChange={e=>setCurrent({...current,weight:e.target.value})} placeholder="Ex.: 20"/></label><label>Reps<input inputMode="numeric" value={current.reps} onChange={e=>setCurrent({...current,reps:e.target.value})} placeholder={String(ex.reps)}/></label></div><button className="primary full" onClick={addSet}><Save size={18}/> Salvar série</button><div className="setDots">{Array.from({length:ex.sets},(_,i)=><span className={i<completed?'done':''} key={i}>{i+1}</span>)}</div></div><RestTimer seconds={ex.rest}/><button className="secondary full" disabled={completed<ex.sets} onClick={()=>last?finish():setIndex(index+1)}>{last?'Finalizar treino':'Próximo exercício'} <ChevronRight/></button></main></>}
+function Workout({program,go,saveWorkout}){
+  const [index,setIndex]=useState(0);
+  const [series,setSeries]=useState({});
+  const [current,setCurrent]=useState({weight:'',reps:''});
+  const ex=program.exercises[index];
+  const loggedSets=series[ex.id]||[];
+  const completed=loggedSets.length;
+  const last=index===program.exercises.length-1;
+  const progress=Math.round(((index+completed/ex.sets)/program.exercises.length)*100);
+  const finish=()=>{
+    saveWorkout({
+      id:Date.now(),
+      date:new Date().toISOString(),
+      programId:program.id,
+      programName:program.name,
+      minutes:parseInt(program.duration)||0,
+      exercises:Object.entries(series).map(([exerciseId,details])=>({
+        exerciseId,
+        sets:details.length,
+        details
+      }))
+    });
+    go('done',program);
+  };
+  const addSet=()=>{
+    if(completed>=ex.sets)return;
+    const reps=Number(current.reps)||Number(ex.reps)||0;
+    const weight=Number(current.weight)||0;
+    setSeries(s=>({...s,[ex.id]:[...(s[ex.id]||[]),{weight,reps}]}));
+    setCurrent({weight:'',reps:''});
+  };
+  const back=()=>go(String(program.id).startsWith('custom-')?'customDetails':'details',program);
+  return <>
+    <Header title="Treino" onBack={back}/>
+    <main className="page">
+      <div className="progressLabel"><span>Exercício {index+1} de {program.exercises.length}</span><b>{Math.min(progress,100)}%</b></div>
+      <div className="progress"><div style={{width:Math.min(progress,100)+'%'}}/></div>
+      <section className="workoutCard">
+        <span>{ex.muscle||ex.group}</span>
+        <h2>{ex.name}</h2>
+        <div className="stats"><div><b>{ex.sets}</b><small>Séries</small></div><div><b>{ex.reps}</b><small>Repetições</small></div><div><b>{ex.rest}s</b><small>Descanso</small></div></div>
+      </section>
+      <div className="setPanel">
+        <h3>Registrar série {completed+1} de {ex.sets}</h3>
+        <div className="formGrid">
+          <label>Carga (kg)<input inputMode="decimal" value={current.weight} onChange={e=>setCurrent({...current,weight:e.target.value})} placeholder="Ex.: 20"/></label>
+          <label>Reps<input inputMode="numeric" value={current.reps} onChange={e=>setCurrent({...current,reps:e.target.value})} placeholder={String(ex.reps)}/></label>
+        </div>
+        <button className="primary full" disabled={completed>=ex.sets} onClick={addSet}><Save size={18}/> Salvar série</button>
+        <div className="setDots">{Array.from({length:ex.sets},(_,i)=><span className={i<completed?'done':''} key={i}>{i+1}</span>)}</div>
+      </div>
+      <RestTimer seconds={ex.rest}/>
+      <button className="secondary full" disabled={completed<ex.sets} onClick={()=>last?finish():setIndex(index+1)}>{last?'Finalizar treino':'Próximo exercício'} <ChevronRight/></button>
+    </main>
+  </>;
+}
 
 function Done({program,go}){return <main className="page done"><div className="doneIcon"><CheckCircle2 size={58}/></div><h1>Treino concluído!</h1><p>Você terminou o programa <b>{program.name}</b>.</p><div className="result"><div><b>{program.exercises.length}</b><span>Exercícios</span></div><div><b>{program.duration}</b><span>Duração</span></div></div><button className="primary full" onClick={()=>go('home')}>Voltar para Home</button><button className="secondary full" onClick={()=>go('history')}>Ver histórico</button></main>}
 
