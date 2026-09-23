@@ -54,5 +54,12 @@ Nunca coloque credenciais administrativas ou chaves privadas no frontend. As var
 - Salvar treinos personalizados localmente e, com Firebase configurado, na nuvem
 - Abrir o treino salvo e iniciar o mesmo fluxo de registro de séries da V2
 
+## V6 - experiência mais profissional
+- Calculadora de IMC no perfil, com altura e peso salvos
+- Biblioteca de treinos globais por objetivo, frequência e nível
+- Curadoria baseada nas recomendações de treinamento de resistência da ACSM 2026
+- Avisos de que IMC é uma medida de triagem e não diagnóstico
+- Tela de descoberta de treinos e detalhes da estrutura
+
 ## Próximas versões
 Autenticação por e-mail/Google, biblioteca de exercícios com vídeos, planos por objetivo, gráficos de carga e publicação mobile.
